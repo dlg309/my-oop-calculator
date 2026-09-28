@@ -5,3 +5,4 @@ class Add:
 
     def get_result(self):
         return self.a + self.b
+
