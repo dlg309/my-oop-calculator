@@ -72,3 +72,37 @@ def test_reject_non_calculation():
         history.add("not a calculation")
 
     assert history.get_history() == []
+
+def test_remove_middle_entry_keeps_neighbors():
+    history = History()
+    first = Add(1, 2)
+    middle = Subtract(5, 1)
+    last = Add(10, 20)
+
+    for calculation in [first, middle, last]:
+        history.add(calculation)
+
+    assert history.remove(1) is middle
+    assert history.get_history() == [first, last]
+
+
+def test_empty_history_rejects_removal():
+    history = History()
+
+    with pytest.raises(IndexError):
+        history.remove(0)
+
+    assert history.get_history() == []
+
+
+def test_remove_last_entry_keeps_previous_order():
+    history = History()
+    first = Add(1, 2)
+    middle = Subtract(5, 1)
+    last = Add(10, 20)
+
+    for calculation in [first, middle, last]:
+        history.add(calculation)
+
+    assert history.remove(2) is last
+    assert history.get_history() == [first, middle]
