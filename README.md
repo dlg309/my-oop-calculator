@@ -1,79 +1,175 @@
 # OOP CLI Calculator
-Purpose
-This project is a Python command-line calculator for my IS 218 course. It uses abstract classes, inheritance, polymorphism, and encapsulation to organize calculations and manage a history of previous entries. The project includes automated tests and a GitHub Actions workflow.
-Requirements
+
+## Purpose
+
+This project is a Python command-line calculator for IS 218. It uses abstract classes, inheritance, polymorphism, and encapsulation to organize calculations and manage a history of previous entries. It also includes automated tests and GitHub Actions.
+
+## Requirements
+
 - Python 3.11 or newer
 - Git
 - A terminal and text editor
+
 The setup commands below are for Ubuntu/WSL, Linux, or macOS.
-Installation
-Clone the repository and open the project folder:
+
+## Installation
+
+Clone the repository:
+
+```bash
 git clone https://github.com/dlg309/my-oop-calculator.git
 cd my-oop-calculator
+```
+
 Create and activate a virtual environment:
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
 Install the testing dependencies:
+
+```bash
 python -m pip install -r requirements.txt
-Run project commands from the folder containing calculator/, tests/, and pytest.ini. When opening a new terminal, return to this folder and activate .venv again.
-Run the Calculator
+```
+
+Run all project commands from the `my-oop-calculator` folder. Activate the virtual environment again when opening a new terminal.
+
+## Run the Calculator
+
+```bash
 python -m calculator
-Command	Description
-add	Add two numbers and save the calculation.
-subtract	Subtract the second number from the first and save the calculation.
-history	Display saved calculations with their operation, inputs, and result.
-remove	Remove a calculation using its displayed number.
-help	Display the available commands.
-exit	Close the calculator.
+```
 
+### Available Commands
 
-Example session:
+| Command | Description |
+| --- | --- |
+| `add` | Add two numbers and save the calculation. |
+| `subtract` | Subtract the second number from the first and save the calculation. |
+| `history` | Display previous calculations with their inputs and results. |
+| `remove` | Remove a calculation using its displayed number. |
+| `help` | Show available commands. |
+| `exit` | Close the calculator. |
+
+### Example Session
+
+```text
 > add
 First number: 10
 Second number: 5
 Result: 15
+> subtract
+First number: 20
+Second number: 7
+Result: 13
 > history
 Calculation History
 
 1. Add: 10, 5 = 15
-> remove
-Calculation History
-
-1. Add: 10, 5 = 15
-Enter calculation number to remove: 1
-Removed: Add: 10, 5 = 15
+2. Subtract: 20, 7 = 13
 > exit
 Goodbye!
-History stays in memory during the current session and is cleared when the program exits. The calculator uses floating-point numbers. Invalid numeric input, nonfinite values, overflowed results, and invalid removal requests are handled without ending the session. Failed calculations are not saved. Ctrl+C and end-of-input close the application cleanly.
-Testing and Coverage
+```
+
+History is stored in memory for the current session and is cleared when the program exits.
+
+The calculator uses floating-point numbers. It handles invalid numeric input, nonfinite numbers, overflowed results, and invalid removal requests. Failed calculations are not added to history. Ctrl+C and end-of-input close the program cleanly.
+
+## Testing and Coverage
+
 Run the tests:
+
+```bash
 python -m pytest
-The suite currently contains 37 tests covering arithmetic, abstract-class behavior, history management, CLI interactions, and error handling. The pytest.ini configuration requires 100% line and branch coverage. A run fails if a test fails or coverage falls below the requirement.
-Assertions compare actual behavior with expected behavior. For example, a removal test checks that the selected object is returned and the remaining entries stay in order. Coverage identifies code that was not executed; it does not prove that every requirement has been implemented correctly.
-To generate an HTML coverage report:
+```
+
+The project currently contains 37 tests covering:
+
+- Addition and subtraction
+- Abstract classes and polymorphism
+- History storage and removal
+- Interactive commands
+- Invalid input and error recovery
+- Interrupted input
+- The application entry point
+
+The `pytest.ini` configuration requires 100% line and branch coverage.
+
+To create an HTML coverage report:
+
+```bash
 python -m pytest --cov-report=term-missing --cov-report=html
-Open htmlcov/index.html to view the report. If tests pass but coverage fails, inspect the missing lines and branches, identify the behavior that would execute them, and add meaningful assertions for that behavior.
-Design Choices
-Component	Responsibility
-Calculation	Stores operands and defines the abstract get_result() method.
-Add and Subtract	Inherit operand initialization and implement their own arithmetic.
-History	Stores calculation objects and controls adding, retrieving, and removing entries.
-CLI	Reads commands, validates input, displays results, and handles errors.
-__main__.py	Starts the calculator when running python -m calculator.
+```
 
+Open `htmlcov/index.html` to view the report.
 
-The operation classes use the same method name, so the caller can request a result without checking each object's type. This is polymorphism.
-History manages calculations instead of inheriting from Calculation. Its get_history() method returns a shallow copy of the internal list. Clearing the returned list does not erase the stored entries, but both lists still reference the same calculation objects.
-GitHub Actions
-The workflow in .github/workflows/tests.yml runs on pushes, pull requests, and manual requests. It installs dependencies and runs the coverage-enforced test suite on Python 3.11, 3.12, 3.13, and 3.14.
-View workflow results
-For a failed run, I would open the failing job and step, then read the first useful error. An installation error, failed assertion, and coverage failure require different fixes.
-Design Reflection
-Adding multiplication
-I would add a Multiply class in calculator/calculation.py that inherits from Calculation and implements get_result() using multiplication. I would also import the class into the CLI, register the multiply command in the operations dictionary, update the help text and README, and add arithmetic and CLI tests. History would not need multiplication logic because it stores calculation objects without performing their arithmetic.
-Sharing a notification contract
-EmailNotification and TextNotification could share a send() method. Both would accept the agreed recipient and message information and report success or failure consistently. The caller could request that a notification be sent without needing to know the delivery details. Each implementation would handle its own service and message format.
-Applying the design in another language
-Separating responsibilities, keeping related state and behavior together, and using a shared interface are ideas I could apply in another language. I would still need to learn that language's rules for constructors, types, access control, inheritance, exceptions, and object lifetime. The design ideas can transfer even when the syntax and runtime behavior differ.
-Course Reference
-This project follows the six-stage IS 218 OOP calculator course.
+Assertions check whether the program produces the expected behavior. Coverage shows which code was executed during testing. Full coverage does not automatically mean every requirement has been implemented correctly.
+
+If the tests pass but coverage fails, I would inspect the missing lines and branches, identify the behavior that reaches them, and add tests with meaningful assertions.
+
+## Design Choices
+
+### Calculation
+
+`Calculation` is an abstract base class. It stores the two operands and requires subclasses to implement `get_result()`.
+
+### Add and Subtract
+
+`Add` and `Subtract` inherit operand initialization from `Calculation`. Each class implements its own arithmetic through `get_result()`.
+
+This supports polymorphism because the caller can use the same method without checking which operation the object represents.
+
+### History
+
+`History` stores calculation objects and manages adding, retrieving, and removing entries. It manages calculations instead of inheriting from `Calculation`.
+
+The `get_history()` method returns a shallow copy of the internal list. Changing the returned list does not change which entries are stored in history. However, the calculation objects inside the two lists are still shared.
+
+### Command-Line Interface
+
+The CLI handles commands, input validation, output, and error messages. Arithmetic stays in the calculation classes, while collection management stays in `History`.
+
+The `__main__.py` file starts the application when running `python -m calculator`.
+
+## GitHub Actions
+
+The workflow in `.github/workflows/tests.yml` runs on pushes, pull requests, and manual requests.
+
+It installs the dependencies and runs the tests with coverage enforcement on:
+
+- Python 3.11
+- Python 3.12
+- Python 3.13
+- Python 3.14
+
+[View GitHub Actions results](https://github.com/dlg309/my-oop-calculator/actions)
+
+If a workflow fails, I would open the failing job and step and read the first useful error. An installation failure, incorrect-result assertion, and coverage failure each require a different fix.
+
+## Design Reflection
+
+### Where would Multiply belong?
+
+I would add a `Multiply` class in `calculator/calculation.py`. It would inherit from `Calculation` and implement `get_result()` using multiplication.
+
+I would also import it into the CLI, register the `multiply` command in the operations dictionary, update the help text and README, and add arithmetic and CLI tests.
+
+`History` would not need multiplication logic because it stores calculation objects without performing their arithmetic.
+
+### What contract could notification objects share?
+
+`EmailNotification` and `TextNotification` could share a `send()` method. Both would accept the agreed recipient and message information and report success or failure consistently.
+
+The caller could request that a notification be sent without knowing the delivery details. Each class would handle its own service and message format.
+
+### What transfers to another programming language?
+
+Separating responsibilities, grouping related state and behavior, and using shared interfaces are ideas I could apply in another language.
+
+I would still need to learn that language's syntax and rules for constructors, types, access control, inheritance, exceptions, and object lifetime. The design ideas can transfer even when the language expresses them differently.
+
+## Course Reference
+
+This project follows the six-stage [IS 218 OOP calculator course](https://github.com/kaw393939/is218-oop-calculator).
